@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+}
+
+
+.snap-x {
+  scroll-snap-type: x mandatory;
+}
+
+.snap-center {
+  scroll-snap-align: center;
+}
+
+@supports (-webkit-overflow-scrolling: touch) {
+  .snap-x {
+    -webkit-overflow-scrolling: touch;
+  }
+}
