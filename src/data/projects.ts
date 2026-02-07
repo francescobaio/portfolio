@@ -1,6 +1,24 @@
 import type { Project } from "../types";
 
 export const projects: Project[] = [
+
+  {
+    id: "mlcv-streethazards",
+    name: "MLCV — Anomaly Segmentation on StreetHazards",
+    description:
+      "Open-set / anomaly segmentation for autonomous driving scenes using the StreetHazards dataset. Focus on predicting closed-set classes (mIoU) while detecting unexpected objects (AUPR). Includes baselines, ablations, qualitative visualizations, explorations on ULRE/UEM-style scoring.",
+    tech: [
+      "PyTorch",
+      "Semantic Segmentation",
+      "Open-Set / OoD",
+      "autonomous-driving",
+      "StreetHazards",
+      "AUPR",
+    ],
+    repo: "https://github.com/francescobaio/streethazards-open-set-segmentation",
+    demo: "https://francescobaio.github.io/streethazards-open-set-segmentation/main.html",
+    year: 2026,
+  },
   {
     id: "soccerai",
     name: "SoccerAI — End-to-end Sports Analytics (World Cup 2022)",
@@ -142,24 +160,6 @@ export const projects: Project[] = [
       "Early-stage library to reconstruct climate-related networks from geospatial time-series data. Performance-critical routines are implemented in Fortran and exposed via F2PY; includes tests to validate extension modules.",
     tech: ["bayes-nets", "Fortran", "F2PY", "NumPy", "CMake"],
     repo: "https://github.com/niccolozanotti/gaussian-bn",
-    demo: "",
-    year: 2025,
-    status: "in-progress",
-  },
-  {
-    id: "mlcv-streethazards",
-    name: "MLCV — Anomaly Segmentation on StreetHazards",
-    description:
-      "Open-set / anomaly segmentation for autonomous driving scenes using the StreetHazards dataset. Focus on predicting closed-set classes (mIoU) while detecting unexpected objects (AUPR). Includes baselines (e.g., Standardized Max Logits), ablations, and clear qualitative visualizations.",
-    tech: [
-      "PyTorch",
-      "Semantic Segmentation",
-      "Open-Set / OoD",
-      "StreetHazards",
-      "mIoU",
-      "AUPR",
-    ],
-    repo: "https://github.com/CVLAB-Unibo/ml4cv-assignment",
     demo: "",
     year: 2025,
     status: "in-progress",
