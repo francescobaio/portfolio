@@ -1,6 +1,6 @@
-import type { SocialLinks } from '../types';
+import type { Interest, SocialLinks, TravelPlace } from '../types';
 
-const BASE = (import.meta as any).env?.BASE_URL ?? '/';
+const BASE = import.meta.env.BASE_URL;
 
 export const avatarUrl = `${BASE}avatar.jpg`;
 export const cvUrl = `${BASE}cv/Francesco_Baiocchi_CV.pdf`;
@@ -11,7 +11,7 @@ export const social: SocialLinks = {
     email: 'mailto:francesco.baiocchi16@gmail.com',
 };
 
-export const interestsMain = [
+export const interestsMain: Interest[] = [
     {
         title: 'Cycling',
         bullets: [
@@ -41,16 +41,11 @@ export const interestsMain = [
     }
 ];
 
-export type TravelPlace = {
-    id: string; city: string; country: string; year: number;
-    photos?: string[];
-};
-
 export const travelPlaces: TravelPlace[] = [
-    { id: 'santorini-2025', city: 'Santorini', country: 'Greece', year: 2025, photos: ['/travel/santorini.jpg'] },
-    { id: 'london-2025', city: 'London', country: 'United Kingdom', year: 2025, photos: ['/travel/london.jpg'] },
-    { id: 'cambridge-2025', city: 'Cambridge', country: 'United Kingdom', year: 2025, photos: ['/travel/cambridge.jpg'] },
-    { id: 'newyork-2023', city: 'New York', country: 'United States', year: 2023, photos: ['/travel/newyork.jpg'] },
-    { id: 'porto-2023', city: 'Porto', country: 'Portugal', year: 2023, photos: ['/travel/porto.jpg'] },
+    { id: 'santorini-2025', city: 'Santorini', country: 'Greece', year: 2025, photos: [`${BASE}travel/santorini.webp`] },
+    { id: 'london-2025', city: 'London', country: 'United Kingdom', year: 2025, photos: [`${BASE}travel/london.webp`] },
+    { id: 'cambridge-2025', city: 'Cambridge', country: 'United Kingdom', year: 2025, photos: [`${BASE}travel/cambridge.webp`] },
+    { id: 'newyork-2023', city: 'New York', country: 'United States', year: 2023, photos: [`${BASE}travel/newyork.webp`] },
+    { id: 'porto-2023', city: 'Porto', country: 'Portugal', year: 2023, photos: [`${BASE}travel/porto.webp`] },
 ];
 

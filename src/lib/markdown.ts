@@ -1,30 +1,57 @@
-export function mdToHtml(md: string): string {
-    let html = (md || '').trim();
+// Minimal Markdown → HTML for blog posts: headings, paragraphs, lists,
+// horizontal rules, bold/italic/code and http(s) links. Content is escaped first.
 
-    html = html.replace(/&/g, '&amp;')
+function escapeHtml(s: string): string {
+    return s
+        .replace(/&/g, '&amp;')
         .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;');
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;');
+}
 
-    html = html.replace(/^###\s+(.+)$/gm, '<h3>$1</h3>')
-        .replace(/^##\s+(.+)$/gm, '<h2>$1</h2>')
-        .replace(/^#\s+(.+)$/gm, '<h1>$1</h1>');
-
-    html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+function inline(s: string): string {
+    return escapeHtml(s)
+        .replace(/`([^`]+)`/g, '<code>$1</code>')
+        .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.+?)\*/g, '<em>$1</em>')
-        .replace(/`([^`]+)`/g, '<code>$1</code>');
+        .replace(/\[(.+?)\]\((https?:\/\/[^\s)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>');
+}
 
-    html = html.replace(/\[(.+?)\]\((https?:[^\)]+)\)/g, '<a href="$2" target="_blank" rel="noreferrer">$1</a>');
+export function mdToHtml(md: string): string {
+    const blocks: string[] = [];
+    let paragraph: string[] = [];
+    let list: string[] = [];
 
-    html = html.replace(/(^|\n)[\t ]*-\s+(.+)(?=\n|$)/g, '$1<li>$2</li>');
+    const flush = () => {
+        if (paragraph.length) blocks.push(`<p>${paragraph.join('<br>')}</p>`);
+        if (list.length) blocks.push(`<ul>${list.map((li) => `<li>${li}</li>`).join('')}</ul>`);
+        paragraph = [];
+        list = [];
+    };
 
-    html = html.replace(/(?:<li>.*<\/li>)(?!\s*<\/ul>)/gs, (m) => `<ul>${m}</ul>`);
+    // Lines are trimmed, so posts can be indented inside template literals.
+    for (const line of (md || '').split('\n').map((l) => l.trim())) {
+        const heading = line.match(/^(#{1,3})\s+(.+)$/);
+        const item = line.match(/^[-*]\s+(.+)$/);
 
-    html = html.replace(/(^|\n)([^<\n][^\n]*)/g, (m, br, line) => {
-        if (/^<h\d|^<ul>|^<li>|^<\/ul>|^<\/li>/.test(line)) return m;
-        const trimmed = line.trim();
-        if (!trimmed) return m;
-        return `${br}<p>${line}</p>`;
-    });
+        if (!line) {
+            flush();
+        } else if (/^(-{3,}|\*{3,})$/.test(line)) {
+            flush();
+            blocks.push('<hr>');
+        } else if (heading) {
+            flush();
+            const level = heading[1].length;
+            blocks.push(`<h${level}>${inline(heading[2])}</h${level}>`);
+        } else if (item) {
+            if (paragraph.length) flush();
+            list.push(inline(item[1]));
+        } else {
+            if (list.length) flush();
+            paragraph.push(inline(line));
+        }
+    }
+    flush();
 
-    return html;
+    return blocks.join('\n');
 }

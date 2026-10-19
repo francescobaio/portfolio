@@ -4,8 +4,27 @@
 
 :root {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
 }
 
+/* Phones: room for the bottom tab bar (MobileNav) */
+.mobile-nav-pad {
+  padding-bottom: calc(3.5rem + env(safe-area-inset-bottom));
+}
+@media (min-width: 768px) {
+  .mobile-nav-pad { padding-bottom: 0; }
+}
+
+/* Horizontal strips that scroll instead of wrapping (chips, filters) */
+.scroll-strip {
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+}
+.scroll-strip::-webkit-scrollbar {
+  display: none;
+}
 
 .snap-x {
   scroll-snap-type: x mandatory;
@@ -19,4 +38,166 @@
   .snap-x {
     -webkit-overflow-scrolling: touch;
   }
+}
+
+/* Blog post body (HTML produced by lib/markdown.ts) */
+@layer components {
+  .blog-body {
+    @apply mt-6 max-w-3xl text-[15px] leading-relaxed text-neutral-800 dark:text-neutral-200;
+  }
+  .blog-body > * + * {
+    @apply mt-4;
+  }
+  .blog-body h1 { @apply text-xl font-semibold; }
+  .blog-body h2 { @apply text-lg font-semibold; }
+  .blog-body h3 { @apply font-semibold; }
+  .blog-body ul { @apply list-disc pl-5 space-y-1; }
+  .blog-body hr { @apply border-neutral-200 dark:border-neutral-800; }
+  .blog-body a { @apply underline text-emerald-700 dark:text-emerald-400; }
+  .blog-body code { @apply px-1 rounded bg-neutral-100 dark:bg-neutral-900; }
+}
+
+/* Terminal */
+.term-screen {
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgb(16 185 129 / 0.06), transparent 60%),
+    theme('colors.neutral.50');
+}
+.dark .term-screen {
+  background:
+    radial-gradient(120% 80% at 0% 0%, rgb(16 185 129 / 0.08), transparent 60%),
+    theme('colors.neutral.950');
+}
+.dark .term-glow {
+  text-shadow: 0 0 8px rgb(52 211 153 / 0.45);
+}
+
+/* Outline only when unfocused: in dark mode `.dark .term-cursor` would otherwise beat `outline-none` and draw extra bars */
+.term-cursor:not(.term-cursor-active) {
+  @apply outline outline-1 -outline-offset-1 outline-emerald-600 dark:outline-emerald-400;
+}
+.term-cursor-active {
+  @apply bg-emerald-600 text-white dark:bg-emerald-400 dark:text-neutral-950;
+  animation: term-blink 1.1s step-end infinite;
+}
+
+.term-row {
+  animation: term-in 0.25s ease-out both;
+}
+.term-bar {
+  transform-origin: left;
+  animation: term-grow 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+@keyframes term-blink {
+  50% { background: transparent; color: inherit; }
+}
+@keyframes term-in {
+  from { opacity: 0; transform: translateY(3px); }
+}
+@keyframes term-grow {
+  from { transform: scaleX(0); }
+}
+
+/* entries re-rendered after a remount don't replay their animation */
+.no-anim .term-row,
+.no-anim .term-bar {
+  animation: none;
+}
+
+/* Pages */
+.bg-dots {
+  background-image: radial-gradient(rgb(0 0 0 / 0.06) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+.dark .bg-dots {
+  background-image: radial-gradient(rgb(255 255 255 / 0.05) 1px, transparent 1px);
+}
+
+/* opacity only: a transform here would break `position: fixed` children (full-screen terminal) */
+.page-in {
+  animation: page-in 0.35s ease-out backwards;
+}
+
+.term-card {
+  @apply border border-neutral-200 dark:border-neutral-800 bg-white/70 dark:bg-neutral-950/70 transition duration-200;
+  animation: term-in 0.35s ease-out both;
+}
+.term-card:hover,
+.term-card:focus-visible {
+  @apply border-emerald-400/70 dark:border-emerald-500/60 outline-none;
+  box-shadow: 0 0 0 1px rgb(52 211 153 / 0.15), 0 8px 30px -12px rgb(16 185 129 / 0.35);
+}
+.term-card-active {
+  @apply border-emerald-400 dark:border-emerald-500;
+  box-shadow: 0 0 0 1px rgb(52 211 153 / 0.35), 0 8px 30px -12px rgb(16 185 129 / 0.45);
+}
+
+.nav-active {
+  @apply border-emerald-400 dark:border-emerald-500 text-emerald-700 dark:text-emerald-400;
+}
+
+.palette-fade {
+  animation: page-in 0.2s ease-out backwards;
+}
+.palette-in {
+  animation: palette-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+}
+
+@keyframes page-in {
+  from { opacity: 0; }
+}
+@keyframes palette-in {
+  from { opacity: 0; transform: translateY(-8px) scale(0.98); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .term-row, .term-bar, .term-cursor-active, .term-card, .page-in, .palette-fade, .palette-in { animation: none; }
+}
+
+/* GitHub README (HTML rendered by GitHub, see lib/github.ts) */
+@layer components {
+  .readme {
+    @apply text-[14px] leading-relaxed text-neutral-800 dark:text-neutral-200 overflow-x-auto;
+  }
+  .readme > * + *,
+  .readme article > * + * {
+    @apply mt-4;
+  }
+  .readme h1 { @apply text-2xl font-semibold mt-8 mb-2 pb-2 border-b border-neutral-200 dark:border-neutral-800; }
+  .readme h2 { @apply text-xl font-semibold mt-8 mb-2 pb-1 border-b border-neutral-200 dark:border-neutral-800; }
+  .readme h3 { @apply text-lg font-semibold mt-6 mb-1; }
+  .readme h4, .readme h5, .readme h6 { @apply font-semibold mt-4; }
+  .readme h1::before, .readme h2::before, .readme h3::before {
+    @apply text-emerald-600 dark:text-emerald-400 mr-2;
+  }
+  .readme h1::before { content: '#'; }
+  .readme h2::before { content: '##'; }
+  .readme h3::before { content: '###'; }
+  .readme .markdown-heading:first-child h1,
+  .readme .markdown-heading:first-child h2 { @apply mt-0; }
+  .readme p { @apply my-3; }
+  .readme ul { @apply list-disc pl-6 my-3 space-y-1; }
+  .readme ol { @apply list-decimal pl-6 my-3 space-y-1; }
+  .readme li > ul, .readme li > ol { @apply my-1; }
+  .readme a, .readme a[data-anchor] { @apply underline decoration-dotted underline-offset-2 text-sky-700 dark:text-sky-400 cursor-pointer; }
+  .readme img { @apply inline-block max-w-full rounded; }
+  .readme code { @apply px-1 py-0.5 rounded bg-neutral-100 dark:bg-neutral-900 text-[0.9em]; }
+  .readme pre { @apply my-4 p-4 rounded-lg overflow-x-auto bg-neutral-100 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-[13px] leading-snug; }
+  .readme pre code { @apply p-0 bg-transparent; }
+  .readme blockquote { @apply my-4 pl-4 border-l-4 border-emerald-400/60 text-neutral-600 dark:text-neutral-400; }
+  .readme table { @apply my-4 block overflow-x-auto border-collapse text-[13px]; }
+  .readme th, .readme td { @apply px-3 py-1.5 border border-neutral-200 dark:border-neutral-800; }
+  .readme th { @apply bg-neutral-100 dark:bg-neutral-900 font-semibold; }
+  .readme hr { @apply my-6 border-neutral-200 dark:border-neutral-800; }
+  .readme details { @apply my-3; }
+  .readme summary { @apply cursor-pointer text-emerald-700 dark:text-emerald-400; }
+  .readme .markdown-alert { @apply my-4 pl-4 border-l-4 border-sky-400/60; }
+  .readme svg.octicon { @apply hidden; }
+}
+
+/* Subtle scrollbar for inner scroll areas */
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(163 163 163 / 0.4) transparent;
 }

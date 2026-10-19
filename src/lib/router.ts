@@ -1,30 +1,44 @@
 import type { Route } from '../types';
+import { parsePath, routeHref } from './routes';
 
-export function parseHash(): Route {
-    const hash = window.location.hash || '';
-    const parts = hash.replace(/^#\/?/, '').split('/');
-    if (!parts[0]) return { page: 'home' };
-    if (parts[0] === 'projects') return { page: 'projects' };
-    if (parts[0] === 'interests') return { page: 'interests' };
-    if (parts[0] === 'blog') {
-        if (parts[1]) return { page: 'post', slug: parts.slice(1).join('/') };
-        return { page: 'blog' };
-    }
-    return { page: 'home' };
+export { parsePath, routeHref, routePath } from './routes';
+
+const NAVIGATE_EVENT = 'portfolio-navigate';
+
+export function currentRoute(): Route {
+    // Old links used hash routing (`/#/projects`): move them to the real path.
+    const { hash } = window.location;
+    if (hash.startsWith('#/')) window.history.replaceState(null, '', hash.slice(1));
+    return parsePath(window.location.pathname);
 }
 
-export function navigateTo(route: Route) {
-    switch (route.page) {
-        case 'home': window.location.hash = '#/'; break;
-        case 'projects': window.location.hash = '#/projects'; break;
-        case 'interests': window.location.hash = '#/interests'; break;
-        case 'blog': window.location.hash = '#/blog'; break;
-        case 'post': window.location.hash = `#/blog/${route.slug}`; break;
-    }
+export function navigateTo(route: Route | string) {
+    const href = typeof route === 'string' ? route : routeHref(route);
+    if (href !== window.location.pathname) window.history.pushState(null, '', href);
+    window.dispatchEvent(new Event(NAVIGATE_EVENT));
 }
 
-export function onHashChange(handler: (route: Route) => void): () => void {
-    const listener = () => handler(parseHash());
-    window.addEventListener('hashchange', listener);
-    return () => window.removeEventListener('hashchange', listener);
+export function onRouteChange(handler: (route: Route) => void): () => void {
+    const listener = () => handler(parsePath(window.location.pathname));
+    window.addEventListener('popstate', listener);
+    window.addEventListener(NAVIGATE_EVENT, listener);
+    return () => {
+        window.removeEventListener('popstate', listener);
+        window.removeEventListener(NAVIGATE_EVENT, listener);
+    };
+}
+
+// Turns clicks on same-site <a href="/..."> links into client-side navigation.
+export function interceptLinks(): () => void {
+    const onClick = (e: MouseEvent) => {
+        if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+        const a = (e.target as Element | null)?.closest?.('a[href]') as HTMLAnchorElement | null;
+        if (!a || a.target || a.hasAttribute('download')) return;
+        const url = new URL(a.href, window.location.href);
+        if (url.origin !== window.location.origin || /\.[a-z0-9]+$/i.test(url.pathname)) return; // files like the CV
+        e.preventDefault();
+        navigateTo(url.pathname);
+    };
+    document.addEventListener('click', onClick);
+    return () => document.removeEventListener('click', onClick);
 }

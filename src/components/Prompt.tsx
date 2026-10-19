@@ -12,7 +12,7 @@ export default function Prompt({
     className = '',
 }: PromptProps) {
     return (
-        <div className={`flex flex-wrap items-center gap-2 select-none ${className}`}>
+        <div className={`flex items-center select-none whitespace-nowrap ${className}`}>
             <span className="text-emerald-600 dark:text-emerald-400">{user}</span>
             <span className="text-neutral-500 dark:text-neutral-400">@</span>
             <span className="text-emerald-600 dark:text-emerald-400">{host}</span>

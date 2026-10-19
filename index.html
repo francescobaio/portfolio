@@ -3,9 +3,22 @@
 
 <head>
   <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="/favicon.ico" sizes="48x48" />
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <!-- title, description and Open Graph tags: filled per page at build time (see vite.config.ts) -->
   <title>Francesco Baiocchi — Portfolio</title>
+  <!--page-meta-->
+  <script>
+    // Apply the saved/system theme before first paint to avoid a light flash (see src/lib/theme.ts).
+    try {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark' || (!t && matchMedia('(prefers-color-scheme: dark)').matches))
+        document.documentElement.classList.add('dark');
+    } catch (e) {}
+  </script>
 </head>
 
 <body>
